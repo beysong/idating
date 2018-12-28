@@ -1,0 +1,128 @@
+@import 'variable';
+
+.content {
+  padding: 30rpx;
+  z-index: 2;
+}
+
+.hover-style {
+  background-color: #f7f7f7;
+}
+
+.page-header-bg {
+  background-color: #474747;
+  position: absolute;
+  top: 64px;
+  height: 240rpx;
+  width: 100%;
+  z-index: 0;
+  /* border: 1px solid; */
+}
+
+.red {
+  color: $color-red;
+}
+
+.red2 {
+  color: $color-red2;
+}
+
+.red3 {
+  color: $color-red3;
+}
+
+.gray {
+  color: $color-gray;
+}
+
+.gray2 {
+  color: $color-gray2;
+}
+
+.gray3 {
+  color: $color-gray3;
+}
+
+.black {
+  color: $color-black;
+}
+
+.mr10 {
+  margin-right: 10rpx;
+}
+
+.mr20 {
+  margin-right: 20rpx;
+}
+
+.ml10 {
+  margin-left: 10rpx;
+}
+
+.ml20 {
+  margin-left: 20rpx;
+}
+
+.mt10 {
+  margin-top: 10rpx;
+}
+
+.mt20 {
+  margin-top: 20rpx;
+}
+
+.mb10 {
+  margin-bottom: 10rpx;
+}
+
+.mb20 {
+  margin-bottom: 20rpx;
+}
+
+.font12 {
+  font-size: 24rpx;
+}
+
+.font13 {
+  font-size: 26rpx;
+}
+
+.font14 {
+  font-size: 28rpx;
+}
+
+.font15 {
+  font-size: 30rpx;
+}
+
+.font16 {
+  font-size: 32rpx;
+}
+
+.font17 {
+  font-size: 34rpx;
+}
+
+.font18 {
+  font-size: 36rpx;
+}
+
+.font19 {
+  font-size: 38rpx;
+}
+
+.font20 {
+  font-size: 40rpx;
+}
+
+.bold {
+  font-weight: 400;
+}
+
+.center {
+  text-align: center;
+}
+
+.underline {
+  text-decoration: underline;
+}

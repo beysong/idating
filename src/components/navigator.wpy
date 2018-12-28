@@ -1,0 +1,159 @@
+
+
+<style lang="less">
+.nav-wrap {
+  // background-color: #474747;
+}
+.nav-content {
+  // height: 60px;
+  position: fixed;
+  background-color: #474747;
+  top: 0;
+  z-index: 223;
+  // border: 2px solid red;
+  width: 100%;
+}
+.nav {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  top: 0;
+  left: 0;
+  z-index: 10;
+}
+.nav-title {
+  width: 100%;
+  height: 45px;
+  line-height: 45px;
+  text-align: center;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+  font-family: PingFang-SC-Medium;
+  font-size: 32rpx;
+  letter-spacing: 2px;
+  color: #fff;
+}
+.nav .back {
+  width: 22px;
+  height: 22px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  padding: 10px 15px;
+  // transform: rotate(180deg);
+}
+.overflow {
+  overflow: auto;
+}
+.hidden {
+  overflow: hidden;
+}
+</style>
+<template>
+  <view class="nav-wrap">
+    <view class="nav-content">
+      <view class="startBar" style="height:{{startBarHeight}}px"></view>
+      <view class="navgation" style="height:{{navgationHeight}}px">
+        <view class="nav" style="height:{{navgationHeight}}px">
+          <view class="nav-title">
+            {{title}}
+            <image
+              wx:if="{{canBack}}"
+              @tap="goBack"
+              src="../images/icons/back.png"
+              mode="aspectFit"
+              class="back"
+            >
+            <image
+              wx:if="{{showHome}}"
+              @tap="goHome"
+              src="../images/icons/home.png"
+              mode="aspectFit"
+              class="back"
+            >
+          </view>
+        </view>
+      </view>
+    </view>
+    <view style="height:{{startBarHeight+navgationHeight}}px;background:{{bgcolor}}"></view>
+  </view>
+</template>
+<script>
+import wepy from 'wepy';
+
+export default class Navigator extends wepy.component {
+  props = {
+    title: {
+      type: String,
+      default: 'wehome智能门禁'
+    },
+    showhome: {
+      type: Boolean,
+      default: true
+    },
+    bgcolor: {
+      type: String,
+      default: '#fff'
+    }
+  };
+  data = {
+    startBarHeight: wepy.$instance.globalData.startBarHeight,
+    navgationHeight: wepy.$instance.globalData.navgationHeight,
+    canBack: false
+  };
+
+  events = {
+    'index-broadcast': (...args) => {
+      let $event = args[args.length - 1];
+      console.log(
+        `${this.$name} receive ${$event.name} from ${$event.source.name}`
+      );
+    }
+  };
+  computed = {
+    canBack() {
+      /* eslint no-undef: 0 */
+      let paths = getCurrentPages();
+      if (paths.length > 1) {
+        return true;
+      }
+      return false;
+    },
+    showHome() {
+      let paths = getCurrentPages();
+      console.log(paths);
+      if (
+        paths.length == 1 &&
+        paths.slice(-1).pop().route !== 'pages/home' &&
+        this.showhome
+      ) {
+        return true;
+      }
+      return false;
+    }
+  };
+  methods = {
+    tap() {
+      // this.num = this.num + 1
+      console.log(this.$name + ' tap');
+    },
+    goBack() {
+      console.log('custom go back');
+      wx.navigateBack();
+    },
+    goHome() {
+      wx.reLaunch({
+        url: '/pages/index'
+      });
+    }
+  };
+
+  onLoad() {
+    this.startBarHeight = wepy.$instance.globalData.startBarHeight;
+    this.navgationHeight = wepy.$instance.globalData.navgationHeight;
+    console.log('this.startBarHeight', this.startBarHeight);
+  }
+}
+</script>

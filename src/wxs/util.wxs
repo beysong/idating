@@ -1,0 +1,10 @@
+var myIndexOf = function(a, i) {
+  return a.indexOf(i);
+}
+var myToFixed = function(v, n) {
+  return v.toFixed(n);
+}
+module.exports = {
+  myIndexOf: myIndexOf,
+  myToFixed: myToFixed
+};

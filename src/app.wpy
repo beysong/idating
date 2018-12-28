@@ -1,0 +1,215 @@
+<style lang="less">
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+</style>
+
+<script>
+import wepy from 'wepy';
+import 'wepy-async-function';
+
+import { setStore } from 'wepy-redux';
+import configStore from './store';
+
+const store = configStore();
+setStore(store);
+
+export default class extends wepy.app {
+  config = {
+    pages: ['pages/index', 'pages/demo', 'pages/login', 'pages/test'],
+    tabBar: {
+      list: [
+        {
+          pagePath: 'pages/index',
+          text: '首页'
+        },
+        {
+          pagePath: 'pages/demo',
+          text: '我的'
+        }
+      ]
+    },
+    window: {
+      backgroundTextStyle: 'light',
+      navigationBarBackgroundColor: '#fff',
+      navigationBarTitleText: 'WeChat',
+      navigationBarTextStyle: 'black'
+    }
+  };
+
+  globalData = {
+    appName: '应用名称',
+    auth: {},
+    userInfo: null
+  };
+
+  constructor() {
+    super();
+    this.use('requestfix');
+    this.use('promisify');
+    this.intercept('request', {
+      config(p) {
+        p.header = this.createAuthHeader();
+        return p;
+      }
+      // success(p) {
+      //   return p.data;
+      // }
+    });
+    this.intercept('uploadFile', {
+      config(p) {
+        p.header = this.createAuthHeader();
+        return p;
+      },
+      success(p) {
+        return p.data;
+      }
+    });
+  }
+
+  async onLaunch(options) {
+    wepy.$instance.globalData.baseUrl = wepy.$appConfig.baseUrl;
+    wepy.$instance.globalData.socketUrl = wepy.$appConfig.socketUrl;
+    wepy.$instance.globalData.uploadUrl = wepy.$appConfig.uploadUrl;
+    wepy.$instance.globalData.imgHost = wepy.$appConfig.imgHost;
+    this.globalData.launchPath = '/' + options.path;
+
+    this.testAsync();
+
+    // 同步权限数据
+    this.syncStoreConfig('token');
+    this.syncStoreConfig('mobile');
+    this.syncStoreConfig('uid');
+    if (!this.globalData.auth.token) {
+      // console.log(this.globalData);
+      await this.doLogin();
+    }
+    /* eslint no-undef: 0 */
+    // let aaa = getCurrentPages();
+    // console.log('0-0-01', aaa);
+    // console.log('0-0-01', options);
+    if (!(await this.getAuthStatus())) {
+      // console.log('0-0-02');
+      setTimeout(() => {
+        wx.reLaunch({
+          url: '/pages/login'
+        });
+      }, 100);
+      console.log('0-0-021');
+    }
+  }
+  onShow(obj) {}
+  onHide() {}
+  onError(err) {}
+  onPageNotFound(res) {}
+
+  /**
+   * 构造权限头部
+   */
+  createAuthHeader() {
+    const token = this.globalData.auth.token || '';
+    const header = {};
+    if (token) {
+      // header['token'] = token
+      header['Cookie'] = 'token=' + token;
+      header['Authorization'] = 'Bearer ' + token;
+    }
+    header['content-type'] = 'text/plain; charset=utf-8';
+    return header;
+  }
+
+  sleep(s) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve('promise resolved');
+      }, s * 1000);
+    });
+  }
+
+  async testAsync() {
+    const data = await this.sleep(3);
+    console.log(data);
+  }
+  async getAuthStatus() {
+    let res = await this.getAuthSetting();
+    // console.log('getAuthStatus', res);
+    return !!res['scope.userInfo'];
+  }
+  async getAuthSetting() {
+    let res = await wepy.getSetting();
+    return res.authSetting;
+  }
+
+  async doLogin() {
+    const { code } = await wepy.login();
+    // const { body } = await this.authLogin(code)
+    const url = `${this.globalData.baseUrl}/beysong/weixin/js_login`;
+    const { data: body } = await wepy.request({
+      url,
+      data: { js_code: code }
+    });
+    console.log(body);
+
+    await this.setConfig('token', body.token || '');
+    await this.setConfig('uid', body.user_id || '');
+    await this.setConfig('mobile', body.mobile || '');
+  }
+  getConfig(key) {
+    return this.globalData.auth[key];
+  }
+  hasConfig(key) {
+    const value = this.getConfig(key);
+    return value !== null && value !== '';
+  }
+  async setConfig(key, value) {
+    await wepy.setStorage({
+      key: key,
+      data: value
+    });
+    this.globalData.auth[key] = value;
+  }
+  async removeConfig(key) {
+    this.globalData.auth[key] = null;
+    await wepy.removeStorage({
+      key: key
+    });
+  }
+  syncStoreConfig(key) {
+    try {
+      const value = wepy.getStorageSync(key);
+      if (value !== '') {
+        console.info(`[auth]${key} sync success `);
+        wepy.$instance.globalData.auth[key] = value;
+      }
+    } catch (e) {
+      console.warn(`[auth]${key} sync fail `);
+    }
+  }
+
+  getUserInfo(cb) {
+    const that = this;
+    if (this.globalData.userInfo) {
+      return this.globalData.userInfo;
+    }
+    console.log('wepy.getUserInfo111');
+    wx.getUserInfo({
+      success(res) {
+        console.log('wepy.getUserInfo2');
+        that.globalData.userInfo = res.userInfo;
+        cb && cb(res.userInfo);
+      },
+      fail(err) {
+        console.log('err');
+      },
+      complete(e) {
+        console.log('complete');
+      }
+    });
+  }
+}
+</script>

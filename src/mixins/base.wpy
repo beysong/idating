@@ -1,0 +1,36 @@
+<script>
+import wepy from 'wepy'
+import Tips from '../utils/Tips'
+// import auth from '../api/auth'
+
+const mta = require('../utils/mta_analysis.js')
+export default class base extends wepy.mixin {
+  config = {}
+  async onLoad() {
+    mta.Page.init() // mta 统计
+    // 注入页面参数
+    const params = wepy.$instance.globalData.pageParams
+    if (params == null) {
+      return
+    }
+    const path = this.$root.$wxpage.route
+    const param = params[path]
+    if (param != null) {
+      console.info(`[minxin] page base init path=${path}, param=`, param)
+      Object.assign(this, param)
+      this.$apply()
+    }
+    // await auth.login()
+  }
+  loaded() {
+    this.init = true
+    this.$apply()
+    Tips.loaded()
+  }
+  methods = {
+    nopen() {
+      Tips.alert('尚未开放')
+    }
+  }
+}
+</script>

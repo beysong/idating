@@ -1,0 +1,13 @@
+{
+  "description": "idating",
+  "setting": {
+    "urlCheck": true,
+    "es6": false,
+    "postcss": false,
+    "minified": false
+  },
+  "compileType": "miniprogram",
+  "appid": "wxe0bbcf95a0d4b9f5",
+  "projectname": "idating",
+  "miniprogramRoot": "./dist"
+}

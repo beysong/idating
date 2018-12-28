@@ -1,0 +1,64 @@
+<style lang="less">
+.userinfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.userinfo-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+}
+
+.userinfo-nickname {
+  color: #aaa;
+}
+</style>
+<template>
+  <view class="container">
+    <view class="userinfo" @tap="handleViewTap">
+      <image class="userinfo-avatar" src="{{ userInfo.avatarUrl }}" background-size="cover">
+      <view class="userinfo-nickname">{{ userInfo.nickName }}</view>
+    </view>
+    <button
+      open-type="getUserInfo"
+      plain
+      class="login-btn"
+      type="primary"
+      bindgetuserinfo="confirm"
+    >授权登录</button>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+
+export default class Index extends wepy.page {
+  config = {
+    navigationBarTitleText: '授权登录'
+  };
+  components = {};
+
+  data = {};
+
+  computed = {};
+
+  methods = {
+    async confirm({ detail }) {
+      // console.log('detail', detail);
+      if (detail.rawData) {
+        await this.$parent.doLogin();
+        wx.reLaunch({
+          url: wepy.$instance.globalData.launchPath || '/pages/index'
+        });
+      }
+    },
+    tap() {
+      console.log('do noting from ');
+    }
+  };
+
+  onLoad() {}
+}
+</script>
